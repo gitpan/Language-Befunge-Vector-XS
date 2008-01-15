@@ -10,12 +10,21 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.1.1 Tue Jan 15 19:19:46 CET 2008
+ - new methods:
+    - get_all_components()
+    - clear()
+    - set_component()
+
 0.1.0 Tue Jan 15 18:23:14 CET 2008
  - constructors more robust (thx rgs)
  - new methods:
     - copy()
-    - _add_inplace(), _substract_inplace()
+    - _add_inplace()
+    - _substract_inplace()
  - removed reference to LB::* modules in tests
+
+**
 
 0.0.1 Tue Jan 15 14:52:14 CET 2008
  - original version

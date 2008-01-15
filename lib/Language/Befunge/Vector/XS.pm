@@ -22,7 +22,7 @@ use overload
 	'<=>' => \&_compare,
 	'""'  => \&as_string;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 require XSLoader;
 XSLoader::load('Language::Befunge::Vector::XS', $VERSION);
@@ -36,9 +36,6 @@ sub as_string {
 }
 
 #sub copy { my $vec = shift; return bless [@$vec], ref $vec; }
-sub get_all_components {$_[0]}
-sub clear {$_[0]}
-sub set_component {$_[0]}
 sub bounds_check {$_[0]}
 sub _add {$_[0]}
 sub _substract {$_[0]}

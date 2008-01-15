@@ -65,7 +65,7 @@ is("$v3", "(0,0,0,0)", "v3 hasn't changed");
 
 # get_all_components()
 my @list = $v1->get_all_components;
-is(scalar @list, 4, "get_all_components returned 2 elements");
+is(scalar @list, 4, "get_all_components returned 4 elements");
 is($list[0], 1, "X is 1");
 is($list[1], 1, "Y is 1");
 is($list[2], 1, "Z is 1");
