@@ -1,0 +1,16 @@
+Revision history for Language::Befunge::Vector::XS.
+
+High-level changelog
+====================
+
+0.0.x initial work
+
+
+Low-level changelog
+===================
+
+0.0.1  
+ - original version
+ - build toolchain in place
+ - constructors + basic accessors
+
