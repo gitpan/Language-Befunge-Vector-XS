@@ -143,9 +143,14 @@ copy( vec, ... )
 #
 IV
 get_dims( self )
-        AV*  self;
+        SV*  self;
+    PREINIT:
+        AV*  my_array;
     CODE:
-        RETVAL = av_len(self) + 1;
+        /* fetch the underlying array of the object */
+        my_array = (AV*)SvRV(self);
+
+        RETVAL = av_len(my_array) + 1;
     OUTPUT:
         RETVAL
 
@@ -157,12 +162,19 @@ get_dims( self )
 #
 IV
 get_component( self, dim )
-        AV*  self;
+        SV*  self;
         IV   dim;
+    PREINIT:
+        AV*  my_array;
     CODE:
-        if ( dim < 0 || dim > av_len(self) )
+        /* fetch the underlying array of the object */
+        my_array = (AV*)SvRV(self);
+
+        /* sanity checks */
+        if ( dim < 0 || dim > av_len(my_array) )
             croak( "No such dimension!" );
-        RETVAL = SvIV( *av_fetch(self, dim, 0) );
+
+        RETVAL = SvIV( *av_fetch(my_array, dim, 0) );
     OUTPUT:
         RETVAL
 
@@ -238,6 +250,141 @@ set_component( self, dim, value )
 
  
 # -- PRIVATE METHODS
+
+#- math ops
+
+#
+# my $vec = $v1->_add($v2);
+# my $vec = $v1 + $v2;
+#
+# Return a new LBVXS object, which is the result of $v1 plus $v2.
+#
+SV*
+_add( v1, v2, variant )
+        SV*  v1;
+        SV*  v2;
+        SV*  variant;
+    INIT:
+        IV   dimv1, dimv2, i, val1, val2;
+        SV*  self;
+        AV*  my_array;
+        AV*  v1_array;
+        AV*  v2_array;
+        HV*  stash;
+    CODE:
+        /* fetch the underlying array of the object */
+        v1_array = (AV*)SvRV(v1);
+        v2_array = (AV*)SvRV(v2);
+        dimv1 = av_len(v1_array);
+        dimv2 = av_len(v2_array);
+
+        /* sanity checks */
+        if ( dimv1 != dimv2 )
+            croak("uneven dimensions in vector addition!");
+
+        /* create the new array and populate it */
+        my_array = newAV();
+        for ( i=0 ; i<=dimv1; i++ ) {
+            val1 = SvIV( *av_fetch(v1_array, i, 0) );
+            val2 = SvIV( *av_fetch(v2_array, i, 0) );
+            av_push( my_array, newSViv(val1+val2) );
+	    }
+
+        /* return a blessed reference to the AV */
+        self  = newRV_noinc( (SV*)my_array );
+        stash = SvSTASH( (SV*)v1_array );
+        sv_bless( (SV*)self, stash );
+        RETVAL = self;
+    OUTPUT:
+        RETVAL
+
+
+#
+# my $vec = $v1->_substract($v2);
+# my $vec = $v1 - $v2;
+#
+# Return a new LBVXS object, which is the result of $v1 minus $v2.
+#
+SV*
+_substract( v1, v2, variant )
+        SV*  v1;
+        SV*  v2;
+        SV*  variant;
+    INIT:
+        IV   dimv1, dimv2, i, val1, val2;
+        SV*  self;
+        AV*  my_array;
+        AV*  v1_array;
+        AV*  v2_array;
+        HV*  stash;
+    CODE:
+        /* fetch the underlying array of the object */
+        v1_array = (AV*)SvRV(v1);
+        v2_array = (AV*)SvRV(v2);
+        dimv1 = av_len(v1_array);
+        dimv2 = av_len(v2_array);
+
+        /* sanity checks */
+        if ( dimv1 != dimv2 )
+            croak("uneven dimensions in vector addition!");
+
+        /* create the new array and populate it */
+        my_array = newAV();
+        for ( i=0 ; i<=dimv1; i++ ) {
+            val1 = SvIV( *av_fetch(v1_array, i, 0) );
+            val2 = SvIV( *av_fetch(v2_array, i, 0) );
+            av_push( my_array, newSViv(val1-val2) );
+	    }
+
+        /* return a blessed reference to the AV */
+        self  = newRV_noinc( (SV*)my_array );
+        stash = SvSTASH( (SV*)v1_array );
+        sv_bless( (SV*)self, stash );
+        RETVAL = self;
+    OUTPUT:
+        RETVAL
+
+
+#
+# my $vec = $v1->_invert;
+# my $vec = -$v1;
+#
+# Subtract $v1 from the origin. Effectively, gives the inverse of the
+# original vector. The new vector is the same distance from the origin,
+# in the opposite direction.
+#
+SV*
+_invert( v1, v2, variant )
+        SV*  v1;
+        SV*  v2;
+        SV*  variant;
+    INIT:
+        IV   dim, i, val;
+        SV*  self;
+        AV*  my_array;
+        AV*  v1_array;
+        HV*  stash;
+    CODE:
+        /* fetch the underlying array of the object */
+        v1_array = (AV*)SvRV(v1);
+        dim = av_len(v1_array);
+
+        /* create the new array and populate it */
+        my_array = newAV();
+        for ( i=0 ; i<=dim; i++ ) {
+            val = SvIV( *av_fetch(v1_array, i, 0) );
+            av_push( my_array, newSViv(-val) );
+	    }
+
+        /* return a blessed reference to the AV */
+        self  = newRV_noinc( (SV*)my_array );
+        stash = SvSTASH( (SV*)v1_array );
+        sv_bless( (SV*)self, stash );
+        RETVAL = self;
+    OUTPUT:
+        RETVAL
+
+
 
 #- inplace math ops
 
@@ -322,15 +469,20 @@ _substract_inplace( v1, v2, variant )
 #
 IV
 _compare( v1, v2, variant )
-        AV*  v1;
-        AV*  v2;
+        SV*  v1;
+        SV*  v2;
         SV*  variant;
 
     INIT:
         IV   dimv1, dimv2, i, val1, val2;
+        AV*  v1_array;
+        AV*  v2_array;
     CODE:
-        dimv1 = av_len(v1);
-        dimv2 = av_len(v2);
+        /* fetch the underlying array of the object */
+        v1_array = (AV*)SvRV(v1);
+        v2_array = (AV*)SvRV(v2);
+        dimv1 = av_len(v1_array);
+        dimv2 = av_len(v2_array);
 
         /* sanity checks */
         if ( dimv1 != dimv2 )
@@ -338,8 +490,8 @@ _compare( v1, v2, variant )
 
         RETVAL = 0;
         for ( i=0 ; i<=dimv1; i++ ) {
-            val1 = SvIV( *av_fetch(v1, i, 0) );
-            val2 = SvIV( *av_fetch(v2, i, 0) );
+            val1 = SvIV( *av_fetch(v1_array, i, 0) );
+            val2 = SvIV( *av_fetch(v2_array, i, 0) );
             if ( val1 != val2 ) {
                 RETVAL = 1;
                 break;

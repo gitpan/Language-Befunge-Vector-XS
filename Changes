@@ -10,6 +10,13 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.1.2 Tue Jan 15 19:46:07 CET 2008
+ - converted rest of AV* to use SV* for objects
+ - new methods:
+    - _add()
+    - _substract()
+    - _invert()
+
 0.1.1 Tue Jan 15 19:19:46 CET 2008
  - new methods:
     - get_all_components()
