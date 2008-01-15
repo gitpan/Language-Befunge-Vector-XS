@@ -18,10 +18,8 @@ use warnings;
 
 use Test::More tests => 73;
 
-use Language::Befunge::IP;
 use Language::Befunge::Vector::XS;
 
-my $ip = Language::Befunge::IP->new;
 my ($v1,$v2,$v3,$v4);
 
 
@@ -34,9 +32,6 @@ is($v1->get_dims,                 3, "three dimensions");
 is($v1->get_component(0),         2, "X is correct");
 is($v1->get_component(1),         1, "Y is correct");
 is($v1->get_component(2),         0, "Z is correct");
-TODO: {
-    local $TODO = 'working on it';
-
 is($v1->as_string,        '(2,1,0)', "stringifies back to (2,1,0)");
 is("$v1",                 '(2,1,0)', "overloaded stringify back to (2,1,0)");
 
@@ -46,6 +41,9 @@ isa_ok( $v1,              "Language::Befunge::Vector::XS");
 is($v1->get_dims, 4,      "four dimensions");
 is("$v1",    '(0,0,0,0)', "all values are 0");
 
+
+TODO: {
+    local $TODO = 'working on it';
 
 # copy()
 $v2 = $v1->copy;
@@ -177,12 +175,12 @@ SKIP: {
     #- constructors
 	# new()
 	throws_ok(sub { Language::Befunge::Vector::XS->new() },
-		qr/Usage/, "Vector::XS->new needs a defined 'dimensions' argument");
+		qr/Usage/, "LBV::XS->new needs a defined 'dimensions' argument");
 	# new_zeroes()
 	throws_ok(sub { Language::Befunge::Vector::XS->new_zeroes() },
-		qr/Usage/, "Vector::XS->new_zeroes needs a defined 'dimensions' argument");
+		qr/Usage/, "LBV::XS->new_zeroes needs a defined 'dimensions' argument");
 	throws_ok(sub { Language::Befunge::Vector::XS->new_zeroes(0) },
-		qr/Usage/, "Vector::XS->new_zeroes needs a non-zero 'dimensions' argument");
+		qr/Usage/, "LBV::XS->new_zeroes needs a non-zero 'dimensions' argument");
 	my $tref_v = Language::Befunge::Vector::XS->new(4, 5, 6);
 	my  $bef_v = Language::Befunge::Vector::XS->new(3, 4);
 

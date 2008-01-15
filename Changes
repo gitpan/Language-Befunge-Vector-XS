@@ -3,13 +3,21 @@ Revision history for Language::Befunge::Vector::XS.
 High-level changelog
 ====================
 
+0.1.x more robust constructors
 0.0.x initial work
 
 
 Low-level changelog
 ===================
 
-0.0.1  
+0.1.0 Tue Jan 15 18:23:14 CET 2008
+ - constructors more robust (thx rgs)
+ - new methods:
+    - copy()
+    - _add_inplace(), _substract_inplace()
+ - removed reference to LB::* modules in tests
+
+0.0.1 Tue Jan 15 14:52:14 CET 2008
  - original version
  - build toolchain in place
  - constructors + basic accessors
