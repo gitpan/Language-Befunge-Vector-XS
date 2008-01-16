@@ -49,6 +49,10 @@ new( class, array, ... )
             AV*    my_array;
             HV*    stash;
     CODE:
+        /* sanity checks */
+        if ( ix_array < 0 )
+        	croak("Usage: %s->new($x,...)", class);
+
         /* create the object and populate it */
         my_array = newAV();
         for ( i=0; i<ix_array; i++ ) {
@@ -82,6 +86,10 @@ new_zeroes( class, dim )
         AV*    my_array;
         HV*    stash;
     CODE:
+        /* sanity checks */
+        if ( dim < 1 )
+        	croak("Usage: %s->new_zeroes($dims)", class);
+
         /* create the object and populate it */
         my_array = newAV();
         for ( i=0; i<dim; i++ ) {
@@ -114,6 +122,7 @@ copy( vec, ... )
         AV*  vec_array;
         HV*  stash;
     CODE:
+        /* fetch the underlying array of the object */
         vec_array = (AV*)SvRV(vec);
 
         /* create the object and populate it */
@@ -195,6 +204,7 @@ get_all_components( self )
         my_array = (AV*)SvRV(self);
         dim = av_len(my_array);
 
+        /* extend the return stack and populate it */
         EXTEND(SP,dim+1);
         for ( i=0; i<=dim; i++ ) {
             val = SvIV( *av_fetch(my_array, i, 0) );
@@ -219,6 +229,8 @@ clear( self )
         /* fetch the underlying array of the object */
         my_array = (AV*)SvRV(self);
         dim = av_len(my_array);
+
+        /* clear each slot */
         for ( i=0; i<=dim; i++ ) {
             zero = newSViv(0);
             av_store(my_array, i, zero);
@@ -249,6 +261,51 @@ set_component( self, dim, value )
         av_store(my_array, dim, newSViv(value));
 
  
+#- other methods
+
+#
+# my $is_within = $vec->bounds_check($begin, $end);
+#
+# Check whether $vec is within the box defined by $begin and $end.
+# Return 1 if vector is contained within the box, and 0 otherwise.
+#
+IV
+bounds_check( self, v1, v2 )
+        SV*  self;
+        SV*  v1;
+        SV*  v2;
+    INIT:
+        IV   i, mydim, dimv1, dimv2, myval, val1, val2;
+        AV*  my_array;
+        AV*  v1_array;
+        AV*  v2_array;
+    PPCODE:
+        /* fetch the underlying array of the object */
+        my_array = (AV*)SvRV(self);
+        v1_array = (AV*)SvRV(v1);
+        v2_array = (AV*)SvRV(v2);
+        mydim = av_len(my_array);
+        dimv1 = av_len(v1_array);
+        dimv2 = av_len(v2_array);
+
+        /* sanity checks */
+        if ( mydim != dimv1 || mydim != dimv2 )
+            croak("uneven dimensions in bounds check!");
+
+        /* compare the arrays */
+        for ( i=0 ; i<=dimv1; i++ ) {
+            myval = SvIV( *av_fetch(my_array, i, 0) );
+            val1  = SvIV( *av_fetch(v1_array, i, 0) );
+            val2  = SvIV( *av_fetch(v2_array, i, 0) );
+            if ( myval < val1 || myval > val2 ) {
+                XPUSHs( sv_2mortal( newSViv(0) ) );
+                RETURN;
+            }
+        }
+        XPUSHs( sv_2mortal( newSViv(1) ) );
+
+
+
 # -- PRIVATE METHODS
 
 #- math ops
@@ -414,6 +471,7 @@ _add_inplace( v1, v2, variant )
         if ( dimv1 != dimv2 )
             croak("uneven dimensions in vector addition!");
 
+        /* update the array slots */
         for ( i=0 ; i<=dimv1; i++ ) {
             val1 = SvIV( *av_fetch(v1_array, i, 0) );
             val2 = SvIV( *av_fetch(v2_array, i, 0) );
@@ -449,6 +507,7 @@ _substract_inplace( v1, v2, variant )
         if ( dimv1 != dimv2 )
             croak("uneven dimensions in vector addition!");
 
+        /* update the array slots */
         for ( i=0 ; i<=dimv1; i++ ) {
             val1 = SvIV( *av_fetch(v1_array, i, 0) );
             val2 = SvIV( *av_fetch(v2_array, i, 0) );
@@ -477,7 +536,7 @@ _compare( v1, v2, variant )
         IV   dimv1, dimv2, i, val1, val2;
         AV*  v1_array;
         AV*  v2_array;
-    CODE:
+    PPCODE:
         /* fetch the underlying array of the object */
         v1_array = (AV*)SvRV(v1);
         v2_array = (AV*)SvRV(v2);
@@ -488,16 +547,15 @@ _compare( v1, v2, variant )
         if ( dimv1 != dimv2 )
             croak("uneven dimensions in bounds check!");
 
-        RETVAL = 0;
+        /* compare the arrays */
         for ( i=0 ; i<=dimv1; i++ ) {
             val1 = SvIV( *av_fetch(v1_array, i, 0) );
             val2 = SvIV( *av_fetch(v2_array, i, 0) );
             if ( val1 != val2 ) {
-                RETVAL = 1;
-                break;
+                XPUSHs( sv_2mortal( newSViv(1) ) );
+                RETURN;
             }
         }
-    OUTPUT:
-        RETVAL
+        XPUSHs( sv_2mortal( newSViv(0) ) );
 
 

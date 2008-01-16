@@ -22,7 +22,7 @@ use overload
 	'<=>' => \&_compare,
 	'""'  => \&as_string;
 
-our $VERSION = '0.1.3';
+our $VERSION = '0.2.0';
 
 require XSLoader;
 XSLoader::load('Language::Befunge::Vector::XS', $VERSION);
@@ -35,142 +35,64 @@ sub as_string {
     return "(@$self)";
 }
 
-#sub copy { my $vec = shift; return bless [@$vec], ref $vec; }
-sub bounds_check {$_[0]}
 
 1;
 __END__
 
 =head1 NAME
 
-Language::Befunge::Vector::XS - an opaque, N-dimensional vector class.
-
-
-
-=head1 SYNOPSIS
-
-    my $v1 = Language::Befunge::Vector::XS->new($x, $y, ...);
-    my $v2 = Language::Befunge::Vector::XS->new_zeroes($dims);
+Language::Befunge::Vector::XS - Language::Befunge::Vector rewritten for speed
 
 
 
 =head1 DESCRIPTION
 
-This class abstracts normal vector manipulation. It lets you pass
-around one argument to your functions, rather than N arguments, one
-per dimension.  This means much of your code doesn't have to care
-how many dimensions you're working with.
+The C<Language::Befunge> module makes heavy use of n-dims vectors,
+mapped to the C<Language::Befunge::Vector> class. This allows to
+abstract the funge dimension while still keeping the same code for the
+operations.
 
-You can do vector arithmetic, test for equality, or even stringify
-the vector to a string like I<"(1,2,3)">.
-
-It has exactly the same api as C<Language::Befunge::Vector>, but LBVXS
-is written in XS for speed reasons.
-
-
-=head1 CONSTRUCTORS
-
-=head2 my $vec = LBV::XS->new( $x [, $y, ...] )
-
-Create a new vector. The arguments are the actual vector data; one
-integer per dimension.
-
-
-=head2 my $vec = LBV::XS->new_zeroes($dims);
-
-Create a new vector of dimension C<$dims>, set to the origin (all zeroes). C<<
-LBV->new_zeroes(2) >> is exactly equivalent to B<< LBV->new(0,0) >>.
-
-
-=head2 my $vec = $v->copy;
-
-Return a new LBV object, which has the same dimensions and coordinates
-as $v.
+However, such an heavy usage does have some impact on the performances.
+Therefore, this modules is basically a rewrite of LBV in XS. If
+installed, then LBV will automagically load it and replace its own
+functions with the XS ones.
 
 
 
-=head1 PUBLIC METHODS
+=head1 METHODS
 
-=head2 my $str = $vec->as_string;
+This module implements exactly the same api as LBV. Please refer to this
+module for more information on the following methods:
 
-Return the stringified form of C<$vec>. For instance, a Befunge vector
-might look like C<(1,2)>.
+=over 4
 
-This method is also applied to stringification, ie when one forces
-string context (C<"$vec">).
+=item new()
 
+=item new_zeroes()
 
-=head2 my $dims = $vec->get_dims;
+=item copy()
 
-Return the number of dimensions, an integer.
+=item as_string()
 
+=item get_dims()
 
-=head2 my $val = $vec->get_component($dim);
+=item get_component()
 
-Get the value for dimension C<$dim>.
+=item get_all_components()
 
+=item clear()
 
-=head2 my @vals = $vec->get_all_components;
+=item set_component()
 
-Get the values for all dimensions, in order from 0..N.
+=item bounds_check()
 
+=item standard mathematical operations
 
-=head2 $vec->clear;
+=item inplace mathematical operations
 
-Set the vector back to the origin, all 0's.
+=item comparison operations
 
-
-=head2 $vec->set_component($dim, $value);
-
-Set the value for dimension C<$dim> to C<$value>.
-
-
-=head2 my $is_within = $vec->bounds_check($begin, $end);
-
-Check whether C<$vec> is within the box defined by C<$begin> and C<$end>.
-Return 1 if vector is contained within the box, and 0 otherwise.
-
-
-
-=head1 MATHEMATICAL OPERATIONS
-
-=head2 Standard operations
-
-One can do some maths on the vectors. Addition and substraction work as
-expected:
-
-    my $v = $v1 + $v2;
-    my $v = $v1 - $v2;
-
-Either operation return a new LBV object, which is the result of C<$v1>
-plus / minus C<$v2>.
-
-The inversion is also supported:
-    my $v2 = -$v1;
-
-will subtracts C<$v1> from the origin, and effectively, gives the
-inverse of the original vector. The new vector is the same distance from
-the origin, in the opposite direction.
-
-
-=head2 Inplace operations
-
-LBV objects also supports inplace mathematical operations:
-
-    $v1 += $v2;
-    $v1 -= $v2;
-
-effectively adds / substracts C<$v2> to / from C<$v1>, and stores the
-result back into C<$v1>.
-
-
-=head2 Comparison
-
-Finally, LBV objects can be tested for equality, ie whether two vectors
-both point at the same spot.
-
-    print "same"   if $v1 == $v2;
-    print "differ" if $v1 != $v2;
+=back
 
 
 =head1 SEE ALSO

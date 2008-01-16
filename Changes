@@ -3,12 +3,22 @@ Revision history for Language::Befunge::Vector::XS.
 High-level changelog
 ====================
 
-0.1.x more robust constructors
-0.0.x initial work
+0.2.x   feature-completeness, 1.0.0-rc
+0.1.x   more robust constructors
+0.0.x   initial work
 
 
 Low-level changelog
 ===================
+
+0.2.0 Wed Jan 16 18:34:38 CET 2008
+ - bounds_check() implemented
+ - added missing sanity checks in constructors
+ - no more todo tests
+ - better way of returning without RETVAL
+ - first rc for 1.0.0
+
+**
 
 0.1.3 Wed Jan 16 17:09:41 CET 2008
  - fixed leftover of RETVAL sillyness

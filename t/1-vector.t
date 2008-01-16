@@ -42,9 +42,6 @@ is($v1->get_dims, 4,      "four dimensions");
 is("$v1",    '(0,0,0,0)', "all values are 0");
 
 
-TODO: {
-    local $TODO = 'working on it';
-
 # copy()
 $v2 = $v1->copy;
 $v3 = $v1;
@@ -230,7 +227,5 @@ SKIP: {
 	# inequality
 	throws_ok(sub { $tref_v != $bef_v },
 		qr/uneven dimensions/, "misaligned vector arithmetic (!=)");
-}
-
 }
 
