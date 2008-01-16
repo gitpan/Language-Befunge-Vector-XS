@@ -22,7 +22,7 @@ use overload
 	'<=>' => \&_compare,
 	'""'  => \&as_string;
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 require XSLoader;
 XSLoader::load('Language::Befunge::Vector::XS', $VERSION);

@@ -59,7 +59,7 @@ new( class, array, ... )
         /* Return a blessed reference to the AV */
         self  = newRV_noinc( (SV*)my_array );
         stash = gv_stashpv( class, TRUE );
-        sv_bless( (SV*)RETVAL, stash );
+        sv_bless( (SV*)self, stash );
         RETVAL = self;
     OUTPUT:
         RETVAL
