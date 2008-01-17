@@ -11,6 +11,10 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.2.1 Thu Jan 17 19:51:37 CET 2008
+ - rewrote vector tests (fixed number of tests during rewrite)
+ - newSViv() returns an SV*, not an IV (quieting warnings)
+
 0.2.0 Wed Jan 16 18:34:38 CET 2008
  - bounds_check() implemented
  - added missing sanity checks in constructors

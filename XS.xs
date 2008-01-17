@@ -116,7 +116,8 @@ SV*
 copy( vec, ... )
         SV*  vec;
     INIT:
-        IV   val, i;
+        IV   i;
+        SV*  val;
         SV*  self;
         AV*  my_array;
         AV*  vec_array;
@@ -223,7 +224,8 @@ void
 clear( self )
         SV*  self;
     INIT:
-        IV   dim, i, zero;
+        IV   dim, i;
+        SV*  zero;
         AV*  my_array;
     PPCODE:
         /* fetch the underlying array of the object */
