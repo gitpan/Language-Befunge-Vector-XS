@@ -281,7 +281,7 @@ bounds_check( self, v1, v2 )
         AV*  my_array;
         AV*  v1_array;
         AV*  v2_array;
-    PPCODE:
+    CODE:
         /* fetch the underlying array of the object */
         my_array = (AV*)SvRV(self);
         v1_array = (AV*)SvRV(v1);
@@ -295,16 +295,18 @@ bounds_check( self, v1, v2 )
             croak("uneven dimensions in bounds check!");
 
         /* compare the arrays */
+        RETVAL = 1;
         for ( i=0 ; i<=dimv1; i++ ) {
             myval = SvIV( *av_fetch(my_array, i, 0) );
             val1  = SvIV( *av_fetch(v1_array, i, 0) );
             val2  = SvIV( *av_fetch(v2_array, i, 0) );
             if ( myval < val1 || myval > val2 ) {
-                XPUSHs( sv_2mortal( newSViv(0) ) );
-                RETURN;
+                RETVAL = 0;
+                break;
             }
         }
-        XPUSHs( sv_2mortal( newSViv(1) ) );
+    OUTPUT:
+        RETVAL
 
 
 
@@ -538,7 +540,7 @@ _compare( v1, v2, variant )
         IV   dimv1, dimv2, i, val1, val2;
         AV*  v1_array;
         AV*  v2_array;
-    PPCODE:
+    CODE:
         /* fetch the underlying array of the object */
         v1_array = (AV*)SvRV(v1);
         v2_array = (AV*)SvRV(v2);
@@ -550,14 +552,16 @@ _compare( v1, v2, variant )
             croak("uneven dimensions in bounds check!");
 
         /* compare the arrays */
+        RETVAL = 0;
         for ( i=0 ; i<=dimv1; i++ ) {
             val1 = SvIV( *av_fetch(v1_array, i, 0) );
             val2 = SvIV( *av_fetch(v2_array, i, 0) );
             if ( val1 != val2 ) {
-                XPUSHs( sv_2mortal( newSViv(1) ) );
-                RETURN;
+                RETVAL = 1;
+                break;
             }
         }
-        XPUSHs( sv_2mortal( newSViv(0) ) );
+    OUTPUT:
+        RETVAL
 
 

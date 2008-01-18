@@ -11,6 +11,9 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.2.2 Fri Jan 18 01:22:30 CET 2008
+ - quieting last C warnings remaining
+
 0.2.1 Thu Jan 17 19:51:37 CET 2008
  - rewrote vector tests (fixed number of tests during rewrite)
  - newSViv() returns an SV*, not an IV (quieting warnings)
