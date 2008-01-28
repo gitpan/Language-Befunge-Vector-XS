@@ -11,6 +11,9 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.2.3 Mon Jan 28 17:14:45 CET 2008
+ - trying to follow ppport.h advices to clean 5.6.x errors
+
 0.2.2 Fri Jan 18 01:22:30 CET 2008
  - quieting last C warnings remaining
 
