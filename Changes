@@ -3,13 +3,18 @@ Revision history for Language::Befunge::Vector::XS.
 High-level changelog
 ====================
 
-0.2.x   feature-completeness, 1.0.0-rc
+1.0.x   module complete
+0.2.x   feature-completeness, clean build errors, 1.0.0-rc
 0.1.x   more robust constructors
 0.0.x   initial work
 
 
 Low-level changelog
 ===================
+
+1.0.0 Sun Feb  3 16:45:41 CET 2008
+ - bumping requirement to 5.8.x
+ - module complete
 
 0.2.3 Mon Jan 28 17:14:45 CET 2008
  - trying to follow ppport.h advices to clean 5.6.x errors
