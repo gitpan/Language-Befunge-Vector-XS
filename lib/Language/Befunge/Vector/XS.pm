@@ -22,7 +22,7 @@ use overload
 	'<=>' => \&_compare,
 	'""'  => \&as_string;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.1.0';
 
 require XSLoader;
 XSLoader::load('Language::Befunge::Vector::XS', $VERSION);
@@ -85,6 +85,8 @@ module for more information on the following methods:
 =item set_component()
 
 =item bounds_check()
+
+=item rasterize()
 
 =item standard mathematical operations
 

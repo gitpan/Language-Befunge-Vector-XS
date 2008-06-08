@@ -8,7 +8,7 @@
 #
 #
 
-BEGIN { require 5.008; }
+BEGIN { require 5.010; }
 use strict;
 use warnings;
 

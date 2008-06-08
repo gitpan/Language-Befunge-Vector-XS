@@ -15,8 +15,9 @@
 
 use strict;
 use warnings;
+use Config;
 
-use Test::More tests => 94;
+use Test::More tests => 151;
 
 use Language::Befunge::Vector::XS;
 
@@ -168,6 +169,35 @@ SKIP: {
 }
 
 
+# rasterize
+$v1 = Language::Befunge::Vector::XS->new(-1, -1, -1);
+$v2 = Language::Befunge::Vector::XS->new(1, 1, 1);
+my @expectations = (
+    [-1, -1, -1], [ 0, -1, -1], [ 1, -1, -1],
+    [-1,  0, -1], [ 0,  0, -1], [ 1,  0, -1],
+    [-1,  1, -1], [ 0,  1, -1], [ 1,  1, -1],
+    [-1, -1,  0], [ 0, -1,  0], [ 1, -1,  0],
+    [-1,  0,  0], [ 0,  0,  0], [ 1,  0,  0],
+    [-1,  1,  0], [ 0,  1,  0], [ 1,  1,  0],
+    [-1, -1,  1], [ 0, -1,  1], [ 1, -1,  1],
+    [-1,  0,  1], [ 0,  0,  1], [ 1,  0,  1],
+    [-1,  1,  1], [ 0,  1,  1], [ 1,  1,  1]);
+for($v3 = $v1->copy; scalar @expectations; $v3 = $v3->rasterize($v1, $v2)) {
+    my $expect = shift @expectations;
+    $expect = Language::Befunge::Vector::XS->new(@$expect);
+    is($v3, $expect, "next one is $expect");
+    is(ref($v3), "Language::Befunge::Vector::XS", "retval is also a LBVXS");
+}
+is($v3, undef, "rasterize returns undef at end of loop");
+
+
+# _xs_rasterize_ptr
+my $ptr = Language::Befunge::Vector::XS::_xs_rasterize_ptr();
+ok(defined($ptr), "rasterize pointer is defined");
+is(length($ptr), $Config{ptrsize}, "rasterize pointer is the right size");
+
+
+
 #- math ops
 
 # addition
@@ -273,4 +303,6 @@ SKIP: {
 	throws_ok(sub { $v2d != $v3d },
 		qr/uneven dimensions/, "misaligned vector arithmetic (!=)");
 }
+
+
 

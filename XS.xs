@@ -26,6 +26,30 @@ void* intArrayPtr(int num) {
     return SvPVX(mortal);
 }
 
+AV *_rasterize(AV *vec_array, AV *min_array, AV *max_array) {
+    IV i, inc = 1, nd = av_len(vec_array);
+    AV *rv = newAV();
+    for (i = 0; i <= av_len(vec_array); i++) {
+        IV thisval, minval, maxval;
+        thisval = SvIV(*av_fetch(vec_array, i, 0));
+        minval  = SvIV(*av_fetch(min_array, i, 0));
+        maxval  = SvIV(*av_fetch(max_array, i, 0));
+        if(inc) {
+            if(thisval < maxval) {
+                inc = 0;
+                thisval++;
+            } else {
+                if(i == nd) {
+                    SvREFCNT_dec(rv);
+                    return NULL;
+                }
+                thisval = minval;
+            }
+        }
+        av_push(rv, newSViv(thisval));
+    }
+    return rv;
+}
 
 
 MODULE = Language::Befunge::Vector::XS		PACKAGE = Language::Befunge::Vector::XS
@@ -310,6 +334,47 @@ bounds_check( self, v1, v2 )
         RETVAL
 
 
+#
+# for(my $v = $min->copy; defined $v; $v = $v->rasterize($min, $max))
+#
+# Return the next vector in raster order, or undef if the hypercube space
+# has been fully covered.  To enumerate the entire storage area, the caller
+# should call rasterize on the storage area's "min" value the first time,
+# and keep looping while the return value is defined.  To enumerate a
+# smaller rectangle, the caller should pass in the min and max vectors
+# describing the rectangle, and keep looping while the return value is
+# defined.
+#
+SV*
+rasterize( self, minv, maxv )
+        SV* self;
+        SV* minv;
+        SV* maxv;
+    INIT:
+        SV*  new;
+        AV*  my_array;
+        AV*  vec_array, *min_array, *max_array;
+        HV*  stash;
+    CODE:
+        /* fetch the underlying array of the object */
+        vec_array = (AV*)SvRV(self);
+        min_array = (AV*)SvRV(minv);
+        max_array = (AV*)SvRV(maxv);
+
+        /* create the object and populate it */
+        my_array = _rasterize(vec_array, min_array, max_array);
+        if(!my_array) {
+            XSRETURN_UNDEF;
+        }
+
+        /* return a blessed reference to the AV */
+        RETVAL = newRV_noinc( (SV*)my_array );
+        stash  = SvSTASH( (SV*)vec_array );
+        sv_bless( (SV*)RETVAL, stash );
+    OUTPUT:
+        RETVAL
+
+
 
 # -- PRIVATE METHODS
 
@@ -566,3 +631,20 @@ _compare( v1, v2, variant )
         RETVAL
 
 
+# private
+
+# my $ptr = $LBV->_xs_rasterize_ptr();
+#
+# Get a pointer to the C "rasterize" function, so that other XS modules can
+# call it directly for speed.
+
+SV*
+_xs_rasterize_ptr()
+    INIT:
+        void *ptr = _rasterize;
+        SV *rv;
+    CODE:
+        rv = newSVpvn((const char *)(&ptr), sizeof(ptr));
+        RETVAL = rv;
+    OUTPUT:
+        RETVAL

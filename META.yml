@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Language-Befunge-Vector-XS
-version:             1.0.0
+version:             1.1.0
 abstract:            Language::Befunge::Vector rewritten for speed
 license:             perl
 author:              

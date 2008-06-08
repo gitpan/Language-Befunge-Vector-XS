@@ -3,6 +3,7 @@ Revision history for Language::Befunge::Vector::XS.
 High-level changelog
 ====================
 
+1.1.x   rasterize() method
 1.0.x   module complete
 0.2.x   feature-completeness, clean build errors, 1.0.0-rc
 0.1.x   more robust constructors
@@ -12,9 +13,17 @@ High-level changelog
 Low-level changelog
 ===================
 
+1.1.0 Sun Jun  8 10:59:08 CEST 2008
+ - new rasterize() method (courtesy of Mark Glines)
+ - bumped perl requirements to 5.10
+
+**
+
 1.0.0 Sun Feb  3 16:45:41 CET 2008
  - bumping requirement to 5.8.x
  - module complete
+
+**
 
 0.2.3 Mon Jan 28 17:14:45 CET 2008
  - trying to follow ppport.h advices to clean 5.6.x errors
