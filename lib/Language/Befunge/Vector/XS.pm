@@ -18,11 +18,12 @@ use overload
 	'-'   => \&_substract,
 	'neg' => \&_invert,
 	'+='  => \&_add_inplace,
-    '-='  => \&_substract_inplace,
+	'-='  => \&_substract_inplace,
 	'<=>' => \&_compare,
+	'eq'  => \&_compare_string,
 	'""'  => \&as_string;
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 require XSLoader;
 XSLoader::load('Language::Befunge::Vector::XS', $VERSION);
@@ -33,6 +34,17 @@ sub as_string {
     my $self = shift;
     local $" = ',';
     return "(@$self)";
+}
+
+#
+# my $bool = $v->_compare($string);
+# my $bool = $v eq $string;
+#
+# Check whether the vector stringifies to $string.
+#
+sub _compare_string {
+    my ($self, $str) = @_;
+    return $self->as_string eq $str;
 }
 
 

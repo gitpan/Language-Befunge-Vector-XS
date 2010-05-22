@@ -13,6 +13,9 @@ High-level changelog
 Low-level changelog
 ===================
 
+1.1.1 Sat May 22 18:25:19 2010
+ - fix #57722: make it work with test::simple 0.95
+
 1.1.0 Sun Jun  8 10:59:08 CEST 2008
  - new rasterize() method (courtesy of Mark Glines)
  - bumped perl requirements to 5.10
